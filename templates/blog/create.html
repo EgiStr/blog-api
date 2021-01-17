@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}
+create Post
+{% endblock title %}
+{% block headextra %}
+ {{form.media}}
+{% endblock headextra %}
+
+{% block content %} 
+<div class="container">
+  <div class="row">
+    
+  <div class="col-sm-6">
+    <div class="container priviews">
+        <h3 class="previews-title">
+        
+        </h3>
+        <p class="previews-body">
+
+        </p>
+    </div>
+  </div>
+
+  <div class="col-sm-6">
+      <div class="container">
+    <form method="post" enctype='multipart/form-data'>
+    {% csrf_token %}
+  <div class="form-group">
+    <label for="judul">judul</label>
+    {% render_field form.title class="form-control" id="judul" placeholder="judul..." %}
+  </div>
+  <div class="form-group">
+    <label for="body">body</label>
+    {{form.content}}
+  </div>
+  <div class="form-group">
+    <label for="tumb">tumb</label>
+    {{form.thumb}}
+  </div>
+  <div class="form-group">
+    <label for="category">category</label>
+    {{form.category}}
+  </div>
+  <div class="form-group">
+    <label for="tag">tags</label>
+    {{form.tags}}
+  </div>
+  
+  {% if error %}
+    <h2>ada yang salah</h2>
+  {% endif %}
+    
+ <button class="btn btn-primary" type="submit">publish</button>
+</form> 
+    </div>
+
+  </div>
+  </div>
+</div>
+ 
+{% endblock content %}
+    

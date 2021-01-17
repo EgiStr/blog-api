@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block css_static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock css_static %}
+
+{% block content %}
+<div class="container-fluid pt-5 "> 
+    <div class="row mb-2 posts">
+        <div class="col-md-12">
+            <div class="cards">
+                <div class="row no-gutters border rounded  flex-md-row mb-4 shadow-sm h-md-250">
+                    <div class="col p-4 d-flex flex-column position-static">
+                        <h3 class="my-1 text-center"><a href="">{{post.title}}</a> <p class="mb-auto text-muted">{{post.publish}}</p></h3> 
+                            <div style="display:flex">
+                                {% for tag in post.tags.all %}
+                                    <a href="{% url 'blog:tag' tag.name %}" class="mr-1 badge badge-info">#{{ tag }}</a>
+                                {% endfor %}
+                            </div>
+                            <p class="mb-auto">{{post.content|safe}}</p>
+                    </div>
+                </div> 
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="comments">
+                <div class="comments-details">
+                    <span class="total-comments comments-sort p-5">{{comments.count}} comment</span>     
+                </div>
+            <div class="comment-box add-comment p-5" style="height: 320px;">
+                <span class="commenter-name">
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {% render_field form.content class="form-control" placeholder="add... comment" %}
+                        <button type="submit" class="btn btn-default">Comment</button>
+                        <button type="cancel" class="btn btn-default">Cancel</button>
+                    </form>
+                </span>
+            </div>
+          </div>
+        <div class="col-md-12">
+            <div class="tab-content">
+                <div class="tab-pane active" id="comments-logout">                
+                    <ul class="media-list">
+                     {% for comment in comments %}
+                        <li class="row media">
+                            <div class="media-body col-md-12">
+                                <div class="well well-lg">
+                                    <h4 class="media-heading text-uppercase reviews">{{comment.user.username}} </h4>
+                                        <p class="media-date text-uppercase reviews list-inline">{{comment.timestamp|timeuntil}}</p>
+                                    <p class="media-comment">
+                                    {{comment.content}}
+                                    </p>
+                                    <a class="btn btn-info btn-circle text-uppercase" href="#replyOneComment" id="reply" data-toggle='collapse'><span class="glyphicon glyphicon-share-alt"></span> Reply</a>
+                                    <a class="btn btn-warning btn-circle text-uppercase" data-toggle="collapse" href="#replyOne"><span class="glyphicon glyphicon-comment"></span> comment reply : {{comment.children.count}}</a>
+                                </div>
+                                <form action="" method="post" class="collapse" id="replyOneComment">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="parent_id" value="{{comment.id}}">
+                                    {% render_field form.content class="form-control" placeholder="add... comment" %}
+                                    <button type="submit" class="btn btn-default">Reply</button>
+                                    <button type="cancel" class="btn btn-default reply-popup">Cancel</button>
+                                </form>    
+                            </div>
+                            {% comment %} buat collapse comment root {% endcomment %}
+                            <div class="collapse col-md-12" id="replyOne">
+                                <ul class="media-list">
+                                {% for reply in comment.children %}
+                                    <li class="media media-replied">
+                                        <div class="media-body">
+                                        <div class="well well-lg">
+                                            <h6 class="media-heading text-uppercase reviews"><span class="glyphicon glyphicon-share-alt">{{reply.user.username}}</span> </h6>
+                                                <p class="media-date text-uppercase reviews list-inline"> {{reply.timestamp|timesince}} </p>
+                                            <p class="media-comment">
+                                                {{reply.content}}
+                                            </p>
+                                            <a class="btn btn-info btn-circle text-uppercase" data-toggle='collapse' href="#replyOneReply" id="reply"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>
+                                            <a class="btn btn-warning btn-circle text-uppercase" data-toggle="collapse" href="#replyReply"><span class="glyphicon glyphicon-comment"></span> reply  : {{reply.children.count}}</a>
+                                            <form action="" method="post" class="collapse" id="replyOneReply">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="parent_id" value="{{reply.id}}">
+                                            {% render_field form.content class="form-control" placeholder="add... comment" %}
+                                            <button type="submit" class="btn btn-default">Reply</button>
+                                            <button type="cancel" class="btn btn-default reply-popup">Cancel</button>
+                                            </form>
+                                        </div>
+
+                                        <div class="collapse col-md-12" id="replyReply">
+                                            <ul class="media-list">
+                                            {% for reply2 in reply.children %}
+                                                <li class="media media-replied">
+                                                    <div class="media-body">
+                                                    <div class="well well-lg">
+                                                        <h6 class="media-heading text-uppercase reviews"><span class="glyphicon glyphicon-share-alt">{{reply2.user.username}}</span> </h6>
+                                                            <p class="media-date text-uppercase reviews list-inline"> {{reply2.timestamp|timesince}} </p>
+                                                        <p class="media-comment">
+                                                            {{reply2.content}}
+                                                        </p>
+                                                        <a class="btn btn-info btn-circle text-uppercase" data-toggle='collapse' href="#replyOneReply2" id="reply"><span class="glyphicon glyphicon-share-alt"></span> Reply</a>
+                                                        <form action="" method="post" class="collapse" id="replyOneReply2">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="parent_id" value="{{reply2.id}}">
+                                                        {% render_field form.content class="form-control" placeholder="add... comment" %}
+                                                        <button type="submit" class="btn btn-default">Reply</button>
+                                                        <button type="cancel" class="btn btn-default reply-popup">Cancel</button>
+                                                        </form>
+                                                    </div>              
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+                                            </ul>
+                                        </div>
+
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                            
+                        </li>                    
+                    {% endfor %}
+                    </ul>
+          </div>   
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
